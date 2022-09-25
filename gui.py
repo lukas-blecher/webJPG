@@ -6,7 +6,7 @@ from tkinter.filedialog import askopenfilenames, askdirectory
 from pathlib import Path
 import subprocess
 
-_version = 0.1
+_version = 0.2
 
 OUTPUT_PATH = Path(__file__).parent
 ASSETS_PATH = OUTPUT_PATH / Path("./assets")
@@ -80,7 +80,7 @@ def convert(files=None):
     args = "-strip -interlace Plane -gaussian-blur 0.05 -quality 85% -sampling-factor 4:2:0 -adaptive-resize 448 -colorspace sRGB".split(
         " "
     )
-    os.chdir(OUTPUT_PATH)
+    os.chdir(str(OUTPUT_PATH))
     if len(files) == 0:
         messagebox.showinfo("Info", "Kein Bild ausgewählt")
         return
