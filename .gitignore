@@ -1,0 +1,6 @@
+*.spec
+dist/
+build/
+.hist
+examples/
+token.txt
