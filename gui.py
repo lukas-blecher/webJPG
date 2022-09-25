@@ -1,4 +1,3 @@
-# pyinstaller
 import os
 from tkinter import messagebox
 from tkinter import *
@@ -11,10 +10,12 @@ _version = 0.1
 
 OUTPUT_PATH = Path(__file__).parent
 ASSETS_PATH = OUTPUT_PATH / Path("./assets")
+history = Path(os.getenv("APPDATA")) / "webjpg" / ".hist"
+if not history.exists():
+    history.parent.mkdir(exist_ok=True)
 
 
 def get_last_path() -> Path:
-    history = OUTPUT_PATH / ".hist"
     if history.exists():
         path = Path(history.open().read())
         if path.exists() and path.is_dir():
@@ -23,7 +24,6 @@ def get_last_path() -> Path:
 
 
 def set_last_path(path: Path):
-    history = OUTPUT_PATH / ".hist"
     with history.open("w") as f:
         f.write(str(path.resolve()))
 
@@ -69,7 +69,10 @@ def convert(files=None):
         files = Path(files)
     if OUTPUT_DIR is None:
         pos_dir = Path(files[0]).resolve().parent
-        resp = messagebox.askokcancel("Speicherort", "Kein Speicherordner ausgewählt.\nIn '%s' speichern" % str(pos_dir))
+        resp = messagebox.askokcancel(
+            "Speicherort",
+            "Kein Speicherordner ausgewählt.\nIn '%s' speichern" % str(pos_dir),
+        )
         if resp:
             OUTPUT_DIR = pos_dir
         else:
@@ -97,7 +100,7 @@ def convert(files=None):
 
 
 window = Tk()
-window.wm_iconbitmap('logo.ico')
+window.wm_iconbitmap("logo.ico")
 window.title("Bilder konvertieren")
 window.geometry("475x320")
 window.configure(bg="#FFFFFF")
@@ -143,7 +146,7 @@ canvas.create_text(
     28.0,
     15.0,
     anchor="nw",
-    text="Bilder auswählen\nSpeicherort (Ordner) auswählen\nAuf 'Konvertieren' drücken",
+    text="Bilder auswählen (auch mehrere möglich)\nSpeicherort (Ordner) auswählen\nAuf 'Konvertieren' drücken",
     fill="#000",
     font=("None", int(10.0)),
 )
