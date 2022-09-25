@@ -62,14 +62,18 @@ def relative_to_assets(path: str) -> Path:
 
 
 def convert(files=None):
-    global NAMES
+    global NAMES, OUTPUT_DIR
     if files is None:
         files = NAMES
     if isinstance(files, Path):
         files = Path(files)
     if OUTPUT_DIR is None:
-        messagebox.showerror("Fehler", "Kein Speicherordner ausgewählt")
-        return
+        pos_dir = Path(files[0]).resolve().parent
+        resp = messagebox.askokcancel("Speicherort", "Kein Speicherordner ausgewählt.\nIn '%s' speichern" % str(pos_dir))
+        if resp:
+            OUTPUT_DIR = pos_dir
+        else:
+            return
     args = "-strip -interlace Plane -gaussian-blur 0.05 -quality 85% -sampling-factor 4:2:0 -adaptive-resize 448 -colorspace sRGB".split(
         " "
     )
@@ -77,7 +81,7 @@ def convert(files=None):
     if len(files) == 0:
         messagebox.showinfo("Info", "Kein Bild ausgewählt")
         return
-    
+
     for i, f in enumerate(set(files)):
         out = OUTPUT_DIR / Path(f).name
         if out.exists():
@@ -93,6 +97,7 @@ def convert(files=None):
 
 
 window = Tk()
+window.wm_iconbitmap('logo.ico')
 window.title("Bilder konvertieren")
 window.geometry("475x320")
 window.configure(bg="#FFFFFF")
