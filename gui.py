@@ -100,7 +100,7 @@ def convert(files=None):
 
 
 window = Tk()
-window.wm_iconbitmap("logo.ico")
+window.wm_iconbitmap("assets/logo.ico")
 window.title("Bilder konvertieren")
 window.geometry("475x320")
 window.configure(bg="#FFFFFF")
