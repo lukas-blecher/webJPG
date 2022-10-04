@@ -1,4 +1,5 @@
 import os
+import re
 from tkinter import messagebox
 from tkinter import *
 from tkinter import ttk
@@ -6,8 +7,8 @@ from tkinter.filedialog import askopenfilenames, askdirectory
 from pathlib import Path
 import subprocess
 
-_version = 0.2
-
+_version = 0.3
+MIN_SIZE = 448
 OUTPUT_PATH = Path(__file__).parent
 ASSETS_PATH = OUTPUT_PATH / Path("./assets")
 history = Path(os.getenv("APPDATA")) / "webjpg" / ".hist"
@@ -77,20 +78,21 @@ def convert(files=None):
             OUTPUT_DIR = pos_dir
         else:
             return
-    args = "-strip -interlace Plane -gaussian-blur 0.05 -quality 85% -sampling-factor 4:2:0 -adaptive-resize 448 -colorspace sRGB".split(
+    args = "-strip -interlace Plane -gaussian-blur 0.05 -quality 85% -sampling-factor 4:2:0 -adaptive-resize {MIN_SIZE} -colorspace sRGB".format(MIN_SIZE=MIN_SIZE).split(
         " "
     )
     os.chdir(str(OUTPUT_PATH))
     if len(files) == 0:
         messagebox.showinfo("Info", "Kein Bild ausgewählt")
         return
-
+    startupinfo = subprocess.STARTUPINFO()
+    startupinfo.dwFlags |= subprocess.STARTF_USESHOWWINDOW
     for i, f in enumerate(set(files)):
         out = OUTPUT_DIR / Path(f).name
         if out.exists():
             out = out.parent / (out.stem + "_web" + out.suffix)
         out = out.parent / (out.stem + ".jpg")
-        subp = subprocess.Popen(["convert", f, *args, str(out)])
+        subp = subprocess.Popen(["convert", f, *args, str(out)], shell=False, startupinfo=startupinfo)
         subp.communicate()
 
         progress["value"] = int((i + 1) / len(files) * 100)
@@ -101,65 +103,134 @@ def convert(files=None):
 
 window = Tk()
 window.wm_iconbitmap("assets/logo.ico")
-window.title("Bilder konvertieren")
-window.geometry("475x320")
+window.title("Bilder konvertieren - webJPG v"+str(_version))
+window.geometry("475x300")
 window.configure(bg="#FFFFFF")
 
 
 canvas = Canvas(
     window,
     bg="#FFFFFF",
-    height=284,
+    height=265,
     width=475,
     bd=0,
     highlightthickness=0,
-    relief="ridge",
+    relief="ridge"
 )
 
 canvas.place(x=0, y=0)
-button_image_1 = PhotoImage(file=relative_to_assets("button_1.png"))
+button_image_1 = PhotoImage(
+    file=relative_to_assets("button_1.png"))
 button_1 = Button(
     image=button_image_1,
     borderwidth=0,
     highlightthickness=0,
     command=open_file,
-    relief="flat",
+    relief="flat"
 )
-button_1.place(x=26.0, y=75.0, width=107.0, height=25.0)
+button_1.place(
+    x=26.0,
+    y=57.0,
+    width=107.0,
+    height=25.0
+)
 
-button_image_2 = PhotoImage(file=relative_to_assets("button_2.png"))
+button_image_2 = PhotoImage(
+    file=relative_to_assets("button_2.png"))
 button_2 = Button(
     image=button_image_2,
     borderwidth=0,
     highlightthickness=0,
     command=dest_dir,
-    relief="flat",
+    relief="flat"
 )
-button_2.place(x=341.0, y=75.0, width=107.0, height=25.0)
-
-entry_image_1 = PhotoImage(file=relative_to_assets("entry_1.png"))
-entry_bg_1 = canvas.create_image(238.0, 170.5, image=entry_image_1)
-entry_1 = Text(bd=0, bg="#D9D9D9", highlightthickness=0)
-entry_1.place(x=28.0, y=111.0, width=420.0, height=117.0)
-
-canvas.create_text(
-    28.0,
-    15.0,
-    anchor="nw",
-    text="Bilder auswählen (auch mehrere möglich)\nSpeicherort (Ordner) auswählen\nAuf 'Konvertieren' drücken",
-    fill="#000",
-    font=("None", int(10.0)),
+button_2.place(
+    x=341.0,
+    y=57.0,
+    width=107.0,
+    height=25.0
 )
 
-button_image_3 = PhotoImage(file=relative_to_assets("button_3.png"))
+entry_image_1 = PhotoImage(
+    file=relative_to_assets("entry_1.png")
+)
+entry_bg_1 = canvas.create_image(
+    238.0,
+    152.5,
+    image=entry_image_1
+)
+entry_1 = Text(
+    bd=0,
+    bg="#D9D9D9",
+    highlightthickness=0
+)
+entry_1.place(
+    x=28.0,
+    y=93.0,
+    width=420.0,
+    height=117.0
+)
+
+button_image_3 = PhotoImage(
+    file=relative_to_assets("button_3.png"))
 button_3 = Button(
     image=button_image_3,
     borderwidth=0,
     highlightthickness=0,
     command=convert,
-    relief="flat",
+    relief="flat"
 )
-button_3.place(x=153.0, y=241.0, width=171.0, height=35.0)
+button_3.place(
+    x=153.0,
+    y=223.0,
+    width=171.0,
+    height=35.0
+)
+
+canvas.create_text(
+    177.0,
+    22.0,
+    anchor="nw",
+    text="Maximale Bildgröße (px)",
+    fill="#000",
+    font=("None", int(10.0))
+)
+
+
+var = StringVar(value=str(MIN_SIZE))
+
+
+def is_type_int(*args):
+    item = var.get()
+    var.set(re.sub(r'\D', '', item))
+    item = var.get()
+    if item:
+        global MIN_SIZE
+        MIN_SIZE = int(item)
+
+
+entry_image_2 = PhotoImage(
+    file=relative_to_assets("entry_2.png")
+)
+entry_bg_2 = canvas.create_image(
+    394.5,
+    34.0,
+    image=entry_image_2
+)
+entry_2 = Entry(
+    bd=0,
+    bg="#D9D9D9",
+    highlightthickness=0,
+    textvariable=var
+)
+
+var.trace("w", is_type_int)
+entry_2.place(
+    x=341.0,
+    y=22.0,
+    width=107.0,
+    height=22.0
+)
 progress = ttk.Progressbar(window, orient=HORIZONTAL, length=420, mode="determinate")
 progress.pack(side="bottom", pady=10)
 window.resizable(False, False)
