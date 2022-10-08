@@ -1,3 +1,19 @@
+'''
+   Copyright 2022 Lukas Blecher
+
+   Licensed under the ImageMagick License (the "License"); you may not use
+   this file except in compliance with the License.  You may obtain a copy
+   of the License at
+
+     https://imagemagick.org/script/license.php
+
+   Unless required by applicable law or agreed to in writing, software
+   distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+   WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
+   License for the specific language governing permissions and limitations
+   under the License.
+'''
+
 import json
 import os
 import re
@@ -8,7 +24,7 @@ from tkinter.filedialog import askopenfilenames, askdirectory
 from pathlib import Path
 import subprocess
 
-_version = 0.3
+_version = 0.4
 MIN_SIZE = 448
 OUTPUT_PATH = Path(__file__).parent
 ASSETS_PATH = OUTPUT_PATH / Path("./assets")
@@ -123,7 +139,7 @@ def convert(files=None):
 
 
 window = Tk()
-window.wm_iconbitmap("assets\\logo.ico")
+window.wm_iconbitmap("assets/logo.ico")
 window.title("Bilder konvertieren - webJPG v" + str(_version))
 window.geometry("475x300")
 window.configure(bg="#FFFFFF")

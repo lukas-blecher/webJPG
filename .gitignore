@@ -1,7 +1,7 @@
 *.spec
 dist/
 build/
-.hist
+temp/
 examples/
 token.txt
 Python*/
